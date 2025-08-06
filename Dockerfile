@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     sudo \
     curl \
     wget \
+    unzip \
     telnet \
     dnsutils \
     iputils-ping \
@@ -25,16 +26,14 @@ RUN apt-get update && apt-get install -y \
     mysql-client \
     postgresql-client \
     bash \
-    bash-completion
+    bash-completion \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
 
 # Enable bash-completion for all users
 RUN echo "source /etc/profile.d/bash_completion.sh" >> /etc/bash.bashrc
-
-# Install MySQL client
-RUN sudo apt-get update && sudo apt-get install -y mysql-client
-
-# Install PostgreSQL client
-RUN sudo apt-get update && sudo apt-get install -y postgresql-client
 
 # Install MongoDB Shell (mongosh)
 RUN curl -fsSL https://pgp.mongodb.com/server-6.0.asc | gpg --dearmor | sudo tee /usr/share/keyrings/mongodb-server-6.0.gpg > /dev/null
@@ -42,5 +41,24 @@ RUN echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://r
     | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
 RUN sudo apt-get update && sudo apt-get install -y mongodb-mongosh
 
+# Install MongoRestore and MongoDump
+RUN sudo apt-get install -y mongodb-database-tools
+
+# Install AWS CLI v2
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip" \
+ && unzip /tmp/awscliv2.zip -d /tmp \
+ && /tmp/aws/install \
+ && rm -rf /tmp/aws /tmp/awscliv2.zip
+
+# Install Docker CLI
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+    echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+    https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+    | tee /etc/apt/sources.list.d/docker.list > /dev/null
+RUN apt-get update && apt-get install -y docker-ce-cli
+
 # Clean up
-RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
