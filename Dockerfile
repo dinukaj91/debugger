@@ -50,13 +50,6 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/aws
  && /tmp/aws/install \
  && rm -rf /tmp/aws /tmp/awscliv2.zip
 
-# Install MySQL CLI (from official MySQL APT repo for compatibility with Ubuntu 24.04)
-RUN curl -fsSL https://dev.mysql.com/get/mysql-apt-config_0.8.29-1_all.deb -o mysql-apt-config.deb && \
-    DEBIAN_FRONTEND=noninteractive dpkg -i mysql-apt-config.deb && \
-    apt-get update && \
-    apt-get install -y mysql-client && \
-    rm -f mysql-apt-config.deb
-
 # Clean up
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
