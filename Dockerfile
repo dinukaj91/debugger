@@ -31,7 +31,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
     lsb-release \ 
-    redis-tools
+    redis-tools \
+    vim
 
 # Enable bash-completion for all users
 RUN echo "source /etc/profile.d/bash_completion.sh" >> /etc/bash.bashrc
